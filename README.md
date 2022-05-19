@@ -1,4 +1,4 @@
-# arc-to-ena
+# ENA converter in ARC2REPO
 A  prototype of ARC to ENA converter with docker image  
 requirement: python3.10 is required for xml support.
 - basic usage: `python3.10 ena-converter.py`  
