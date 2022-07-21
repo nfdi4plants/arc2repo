@@ -11,7 +11,7 @@ to test the converter, you can run it in the docker with prepared dockerfile
 Following commandlines can be used to build and run the docker image/container
 - Build: `docker build --tag arc2repo .`
 - Run: `docker run -d --name a2r arc2repo`
-- Copy the file to local: `sudo docker cp a2e1:/arc-to-ena .`
+- Copy the file to local: `sudo docker cp a2r:/arc2repo .`
 
 You can also modify the input argument of the python script from docker commands, for example:
 - Run: `docker run -d --name a2r arc2repo python3 ena-converter.py -a inv.json -m mapping_ERC000037.xlsx`
