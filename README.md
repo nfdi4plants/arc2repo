@@ -16,11 +16,11 @@ You can also modify the input argument of the python script from docker commands
 - Run: `docker run -d --name a2e arc-to-ena python3 ena-converter.py -a inv.json -m mapping_ERC000037.xlsx`
 
 
-# Input: inv.json
+## Input: inv.json
 inv.json is a output of ARCcommander
 See explaination here https://github.com/nfdi4plants/arcCommander/pull/66
 `arc export` exports full arc as `investigation.json`
 
-# Output: STUDY.XML
+## Output: STUDY.XML
 STUDY.XML is one of the accepted file of ENA
 See explaination here https://www.ebi.ac.uk/ena/browser/submit
