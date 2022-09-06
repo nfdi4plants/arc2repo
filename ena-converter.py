@@ -212,9 +212,9 @@ def write_smaple_xml(xml_input):
     output_list = sample[sample["output_name"].notna()]
 
     a = et.Element('SAMPLE_SET')
-    for i,input_name in enumerate(input_list["input_name"].unique()):
+    for index1,input_name in enumerate(input_list["input_name"].unique()):
         one_sample = sample[sample['input_name'] == input_name]
-        for i, tags in enumerate(one_sample):
+        for index2, tags in enumerate(one_sample):
             b = et.SubElement(a, 'SAMPLE')
 
             b.attrib = {'alias': input_name , 'center_name':''}
@@ -233,12 +233,12 @@ def write_smaple_xml(xml_input):
             g.text = input_name
 
             h = et.SubElement(b, 'SAMPLE_ATTRIBUTES')
-            for index, row in one_sample.iterrows():
-                i = et.SubElement(h,'SAMPLE_ATTRIBUTE' )
-                j = et.SubElement(i, 'TAG')
+            for index3, row in one_sample.iterrows():
+                m = et.SubElement(h,'SAMPLE_ATTRIBUTE' )
+                j = et.SubElement(m, 'TAG')
                 j.text = str(row['term_name'])
 
-                k = et.SubElement(i, 'VALUE')
+                k = et.SubElement(m, 'VALUE')
                 k.text = str(row['value']) 
 
 
