@@ -9,6 +9,7 @@ from ena import *
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = {'txt', 'json',}
 mapping_file = 'mapping_ERC000037.xlsx'
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
