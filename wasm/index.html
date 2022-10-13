@@ -5,12 +5,25 @@
   </head>
   <body>
     Pyodide test page <br>
-    Open your browser console to see Pyodide output
+		<input type="file" id="input_json" name="json" multiple/>
+	<input type="file" id="input_xlsx" name="xlsx" multiple/>
+	<button id="submit" onclick="main();"> submit </button>
     <script type="text/javascript">
-      let pyodide;
+	var input_json , input_xlsx;
+	const input1 = document.getElementById("input_json");
+	input1.addEventListener("change", handleFiles1, false);
+	function handleFiles1() {
+	  input_json = this.files; 
+	};
+	const input2 = document.getElementById("input_xlsx");
+	input2.addEventListener("change", handleFiles2, false);
+	function handleFiles2() {
+	  input_xlsx = this.files; 
+	};
+    let pyodide;
 async function main() {
   pyodide = await loadPyodide();
-  //await pyodide.loadPackage(["sys","json","getopt","xml.etree.ElementTree","pandas"]);
+  await pyodide.loadPackage(["pandas"]);
   pyodide.runPython(`
 import sys, getopt
 import xml.etree.ElementTree as et 
@@ -18,9 +31,9 @@ import json
 import pandas as pd
 import subprocess
 import numpy as np
+from pyodide.http import pyfetch
+from js import XMLHttpRequest
 
-# new function (rewritten)
-# print("Started Reading JSON file")
 
 
 def append_table_protocol(element, json_rows):
@@ -377,22 +390,7 @@ def convert_json(arc_json_file, mapping_file):
 
 
 
-    json_table = pd.DataFrame(json_rows, columns= json_cols)
-    mapping = pd.read_excel(mapping_file)
-    term_id = mapping.iloc[:,2]
-    mapping.iloc[:,3] = term_id.map( lambda x: "http://purl.obolibrary.org/obo/{}".format( str(x).replace(":", "_") )  )
 
-    
-    json_table["ena_id"] = json_table["term_name"]
-    a = json_table.loc[:, "ena_id"]
-    # a = json_table.loc[:, "term_accession"]
-    term_mapping = mapping.iloc[:,3]
-    for i, term in enumerate(term_mapping):
-         cond = json_table["term_accession"] == term
-    #     print(term)
-    #     print(filter_)
-         a.mask(cond , mapping.loc[:, "Field Name"][i], inplace= True)
-    json_table.to_csv('json_table_new.csv')
     
     
     a = et.Element('PROJECT_SET')
@@ -414,16 +412,35 @@ def convert_json(arc_json_file, mapping_file):
     # sample xml
     xml_input = pd.read_csv("json_table_new.csv")
     write_smaple_xml(xml_input)
-  `)
-
-    arc_json_file = await pyfetch("https://github.com/nfdi4plants/arc2repo/raw/main/inv.json")
-    await arc_json_file.unpack_archive()
-	mapping_file = await pyfetch("https://github.com/nfdi4plants/arc2repo/raw/main/mapping_ERC000037.xlsx")
-    await mapping_file.unpack_archive()
-    convert_json(arc_json_file, mapping_file)
   
+req1 = XMLHttpRequest.new()
+req1.open("GET", "./inv.json", False)
+req1.send(None)
+arc_json_file = str(req1.response)
+with open("inv.json", "w") as fh:
+      fh.write(arc_json_file)
+
+req2 = XMLHttpRequest.new()
+req2.open("GET", "./mapping_ERC000037.xlsx", False)
+req2.send(None)
+mapping_file = str(req2.response)
+with open("mapping_ERC000037.xlsx", "w") as fh:
+      fh.write(mapping_file)
+
+
+req3 = XMLHttpRequest.new()
+req3.open("GET", "./json_table_new.csv", False)
+req3.send(None)
+json_table_new = str(req3.response)
+with open("json_table_new.csv", "w") as fh:
+      fh.write(json_table_new)
+
+convert_json("inv.json", "mapping_ERC000037.xlsx")
+ `);
+
 }
-main();
+ 
     </script>
+
   </body>
 </html>
