@@ -39,13 +39,15 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			
             convert_json("uploads/"+filename, mapping_file)
+			
             return redirect(url_for('download_file', name="SAMPLE.xml"))
     return '''
     <!doctype html>
     <title>arc2repo: ENA</title>
-    <h1>Upload investigation JSON file and download SAMPLE.xml for ENA upload</h1>
-    <form method=post enctype=multipart/form-data>
+    <h1 style="text-align: center;">Upload ARC JSON file</h1>
+    <form style="text-align: center;" method=post enctype=multipart/form-data>
       <input type=file name=file>
       <input type=submit value=Upload>
     </form>
