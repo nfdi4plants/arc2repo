@@ -5,54 +5,52 @@
   </head>
   <body>
     Browser app converts ARC.JSON to SAMPLE.XML for ENA repo <br>
-		<input style="" type="file" id="input_json" name="json" multiple/>
-	<input style="display:none" type="file" id="input_xlsx" name="xlsx" multiple/>
-	<button id="submit" onclick="main(input_json);"> start conversion </button>
-		<div style="margin:auto;" id="xml_output">
-	</div>
+        <input style="" type="file" id="input_json" name="json" multiple/>
+    <input style="display:none" type="file" id="input_xlsx" name="xlsx" multiple/>
+    <button id="submit" onclick="main(input_json);"> start conversion </button>
+        <div style="margin:auto;" id="xml_output">
+    </div>
     <script type="text/javascript">
     var input_json , input_xlsx;
-	const input1 = document.getElementById("input_json");
-	input1.addEventListener("change", handleFiles1, false);
-	function handleFiles1() {
+    const input1 = document.getElementById("input_json");
+    input1.addEventListener("change", handleFiles1, false);
+    function handleFiles1() {
 
-		if (this.files.length > 0) 
+        if (this.files.length > 0) 
       {
         var reader = new FileReader(); // File reader to read the file 
         
         // This event listener will happen when the reader has read the file
         reader.addEventListener('load', function() {
-          var result = JSON.parse(reader.result); // Parse the result into an object 
-          
-          console.log(result);
-          console.log(result.name);
-          console.log(result.age);
-          console.log(result.occupation);
+          var result = JSON.stringify(JSON.parse(reader.result)); // Parse the result into an object 
+          console.log("reader.result is : "+reader.result);
+          input_json = result;
+          //console.log("result is : "+result);
+
         });
         
         reader.readAsText(this.files[0]); // Read the uploaded file
-	
-		input_json = reader.result;
-	
-	
-	
-	
-	};
-	}
-	
-	const input2 = document.getElementById("input_xlsx");
-	input2.addEventListener("change", handleFiles2, false);
-	function handleFiles2() {
-	  input_xlsx = this.files; 
-	};
+
+    
+    
+    
+    
+    };
+    }
+    
+    const input2 = document.getElementById("input_xlsx");
+    input2.addEventListener("change", handleFiles2, false);
+    function handleFiles2() {
+      input_xlsx = this.files; 
+    };
     let pyodide;
-	
-	async function main(input_json) {
-	pyodide = await loadPyodide();
-	await pyodide.loadPackage(["pandas"]);
-	//let namespace = pyodide.globals.get("dict")();
-	let namespace = pyodide.toPy({ input_json:input_json });
-	pyodide.runPython(`
+    
+    async function main(input_json) {
+    pyodide = await loadPyodide();
+    await pyodide.loadPackage(["pandas"]);
+    //let namespace = pyodide.globals.get("dict")();
+    let namespace = pyodide.toPy({ input_json:input_json });
+    pyodide.runPython(`
 import time
 import sys, getopt
 import xml.etree.ElementTree as et 
@@ -409,7 +407,22 @@ def convert_json(arc_json_file, mapping_file):
 
 
 
+    json_table = pd.DataFrame(json_rows, columns= json_cols)
+    mapping = pd.read_csv(mapping_file)
+    term_id = mapping.iloc[:,2]
+    mapping.iloc[:,3] = term_id.map( lambda x: "http://purl.obolibrary.org/obo/{}".format( str(x).replace(":", "_") )  )
 
+    
+    json_table["ena_id"] = json_table["term_name"]
+    a = json_table.loc[:, "ena_id"]
+    # a = json_table.loc[:, "term_accession"]
+    term_mapping = mapping.iloc[:,3]
+    for i, term in enumerate(term_mapping):
+         cond = json_table["term_accession"] == term
+    #     print(term)
+    #     print(filter_)
+         a.mask(cond , mapping.loc[:, "Field Name"][i], inplace= True)
+    json_table.to_csv('json_table_new.csv')
     
     
     a = et.Element('PROJECT_SET')
@@ -443,21 +456,21 @@ with open("inv.json", "w") as fh:
       fh.write(input_json)
 
 req2 = XMLHttpRequest.new()
-req2.open("GET", "./mapping_ERC000037.xlsx", False)
+req2.open("GET", "./mapping_ERC000037.csv", False)
 req2.send(None)
 mapping_file = str(req2.response)
-with open("mapping_ERC000037.xlsx", "w") as fh:
+with open("mapping_ERC000037.csv", "w") as fh:
       fh.write(mapping_file)
 
 
-req3 = XMLHttpRequest.new()
-req3.open("GET", "./json_table_new.csv", False)
-req3.send(None)
-json_table_new = str(req3.response)
-with open("json_table_new.csv", "w") as fh:
-      fh.write(json_table_new)
+#req3 = XMLHttpRequest.new()
+#req3.open("GET", "./json_table_new.csv", False)
+#req3.send(None)
+#json_table_new = str(req3.response)
+#with open("json_table_new.csv", "w") as fh:
+#      fh.write(json_table_new)
 
-convert_json("inv.json", "mapping_ERC000037.xlsx")
+convert_json("inv.json", "mapping_ERC000037.csv")
 end = time.time()
 used_time = end - start
 print("used time is: {} ".format(used_time) )
