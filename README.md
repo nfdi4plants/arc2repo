@@ -1,5 +1,6 @@
 # ENA converter in ARC2REPO
-:computer: We now have a single-page-application [web app](https://nfdi4plants.github.io/arc2repo/), testing and feedback are very welcome :smiley:  
+:computer: We now have a single-page-application [web app](https://nfdi4plants.github.io/arc2repo/), testing and feedback are very welcome :smiley:   
+Please use [arcCommander version 0.2.1](https://github.com/nfdi4plants/arcCommander/releases/tag/v0.2.1-linux.x64) to create the JSON to convert  
 A  prototype of ARC to ENA converter with docker image  
 requirement: python3.10 is required for xml support.
 - basic usage: `python3.10 ena-converter.py`  
