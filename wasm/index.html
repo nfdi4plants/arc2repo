@@ -188,6 +188,7 @@ import subprocess
 import numpy as np
 from pyodide.http import pyfetch
 from js import XMLHttpRequest
+import js
 # print(input_json)
 start = time.time()
 print("start")
@@ -472,37 +473,40 @@ def convert_json(arc_json_file, mapping_file):
     file_id = arc_json.get("identifier")
     section = "studies"
     studies = arc_json.get("studies")
-    arc_id = studies[0].get("identifier")
-    processSequences = arc_json.get("studies")[0].get('assays')[0].get("processSequence")
+    arc_id = studies[0].get("identifier") if studies[0] is not None else None    
+    processSequences = arc_json.get("studies")[0].get('assays')[0].get("processSequence")  
+    try:     
+        for process_seq in processSequences:
 
-    for process_seq in processSequences:
+            subsection_id = process_seq.get("name")
+            #  print(subsection_id)
 
-        subsection_id = process_seq.get("name")
-        #  print(subsection_id)
+            parameter_values = process_seq.get("parameterValues")
+            append_table_assays(parameter_values, json_rows)
+            init_none() 
+            input_section = process_seq.get("inputs")
+            if input_section != None:
+        #     print(input_section)
+                for i,input_ in enumerate(input_section):
+                    input_name = input_.get("name")
+                    input_id = i
 
-        parameter_values = process_seq.get("parameterValues")
-        append_table_assays(parameter_values, json_rows)
-        init_none() 
-        input_section = process_seq.get("inputs")
-        if input_section != None:
-    #     print(input_section)
-            for i,input_ in enumerate(input_section):
-                input_name = input_.get("name")
-                input_id = i
-
-                derived_from = input_.get("derivesFrom")[0].get("name") if input_.get("derivesFrom") is not None else None
-                #  print(input_name + " derivesFrom is ", derived_from)
-                characteristics = input_.get("characteristics") 
-                if characteristics != None:
-                    append_c_input(characteristics,json_rows)
-                factorvalues = input_.get("factorValues") 
-                if factorvalues != None:
-                        append_input(factorvalues,json_rows)
-
-
-
-            
-        output_section = process_seq.get("outputs")
+                    derived_from = input_.get("derivesFrom")[0].get("name") if input_.get("derivesFrom") is not None else None
+                    #  print(input_name + " derivesFrom is ", derived_from)
+                    characteristics = input_.get("characteristics") 
+                    if characteristics != None:
+                        append_c_input(characteristics,json_rows)
+                    factorvalues = input_.get("factorValues") 
+                    if factorvalues != None:
+                            append_input(factorvalues,json_rows)
+                            output_section = process_seq.get("outputs")
+    except:
+        js.window.alert("ProcessSequence is not found, check if you have studies in the JSON file")
+        js.stop()
+        return print("ProcessSequence is not found, check if you have studies in the JSON file")
+    
+        
+        
 
     #     print(output_section)
         for i, output_ in enumerate(output_section):
@@ -603,7 +607,8 @@ end = time.time()
 used_time = end - start
 print("Time used for conversion is: {} seconds".format(round(used_time, 2)) )
  `,{ globals: namespace });
- let xmloutput = namespace.get("xmloutput");
+let xmloutput = namespace.get("xmloutput");
+if (typeof xmloutput === "undefined") { document.getElementById("waiting").classList.add("d-none"); return; };
 var saveData = (function () {
     var a = document.createElement("a");
     document.body.appendChild(a);
@@ -740,6 +745,7 @@ import subprocess
 import numpy as np
 from pyodide.http import pyfetch
 from js import XMLHttpRequest
+import js
 # print(input_json)
 start = time.time()
 print("start")
@@ -1024,32 +1030,37 @@ def convert_json(arc_json_file, mapping_file):
     file_id = arc_json.get("identifier")
     section = "studies"
     studies = arc_json.get("studies")
-    arc_id = studies[0].get("identifier")
-    processSequences = arc_json.get("studies")[0].get('assays')[0].get("processSequence")
+    arc_id = studies[0].get("identifier") if studies[0] is not None else None    
+    processSequences = arc_json.get("studies")[0].get('assays')[0].get("processSequence")  
+    try:     
+        for process_seq in processSequences:
 
-    for process_seq in processSequences:
+            subsection_id = process_seq.get("name")
+            #  print(subsection_id)
 
-        subsection_id = process_seq.get("name")
-        #  print(subsection_id)
+            parameter_values = process_seq.get("parameterValues")
+            append_table_assays(parameter_values, json_rows)
+            init_none() 
+            input_section = process_seq.get("inputs")
+            if input_section != None:
+        #     print(input_section)
+                for i,input_ in enumerate(input_section):
+                    input_name = input_.get("name")
+                    input_id = i
 
-        parameter_values = process_seq.get("parameterValues")
-        append_table_assays(parameter_values, json_rows)
-        init_none() 
-        input_section = process_seq.get("inputs")
-        if input_section != None:
-    #     print(input_section)
-            for i,input_ in enumerate(input_section):
-                input_name = input_.get("name")
-                input_id = i
-
-                derived_from = input_.get("derivesFrom")[0].get("name") if input_.get("derivesFrom") is not None else None
-                #  print(input_name + " derivesFrom is ", derived_from)
-                characteristics = input_.get("characteristics") 
-                if characteristics != None:
-                    append_c_input(characteristics,json_rows)
-                factorvalues = input_.get("factorValues") 
-                if factorvalues != None:
-                        append_input(factorvalues,json_rows)
+                    derived_from = input_.get("derivesFrom")[0].get("name") if input_.get("derivesFrom") is not None else None
+                    #  print(input_name + " derivesFrom is ", derived_from)
+                    characteristics = input_.get("characteristics") 
+                    if characteristics != None:
+                        append_c_input(characteristics,json_rows)
+                    factorvalues = input_.get("factorValues") 
+                    if factorvalues != None:
+                            append_input(factorvalues,json_rows)
+                            output_section = process_seq.get("outputs")
+    except:
+        js.window.alert("ProcessSequence is not found, check if you have studies in the JSON file")
+        js.stop()
+        return print("ProcessSequence is not found, check if you have studies in the JSON file")
 
 
 
@@ -1165,6 +1176,7 @@ used_time = end - start
 print("Time used for conversion is: {} seconds".format(round(used_time, 2)) )
 `,{ globals: namespace });
 v_list = namespace.get("df_all");
+if (typeof v_list === "undefined") { document.getElementById("waiting").classList.add("d-none"); return; };
 document.getElementById('m_v_modal').click();
 document.getElementById('init_word').innerText = "The following terms are missing in the metadata of ARC.JSON";
 document.getElementById('mandatory_n').innerText = v_list.get(1).length;
